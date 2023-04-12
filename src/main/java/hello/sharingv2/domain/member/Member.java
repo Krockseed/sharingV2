@@ -75,4 +75,17 @@ public class Member extends BaseTimeEntity {
     public void encodePassword(PasswordEncoder encoder) {
         this.password = encoder.encode(password);
     }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", name='" + name + '\'' +
+                ", authority=" + authority +
+                ", refreshToken='" + refreshToken + '\'' +
+                '}';
+    }
 }

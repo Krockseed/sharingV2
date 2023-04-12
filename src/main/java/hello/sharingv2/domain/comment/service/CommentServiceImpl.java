@@ -59,8 +59,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void delete(Long id) throws Exception {
-        Comment comment = commentRepository.findById(id).orElseThrow(
+    public void delete(Long commentId) throws Exception {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new PostException(PostExceptionType.NOT_FOUND_COMMENT)
         );
 
@@ -71,13 +71,14 @@ public class CommentServiceImpl implements CommentService {
                 commentRepository.delete(comment);
             }
         } else {
-            commentRepository.delete(comment);
+//            DB에서 삭제 처리 X
+//            commentRepository.delete(comment);
         }
     }
 
     @Override
-    public void update(Long id, CommentDto commentDto) throws Exception {
-        Comment comment = commentRepository.findById(id).orElseThrow(
+    public void update(Long commentId, CommentDto commentDto) throws Exception {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new PostException(PostExceptionType.NOT_FOUND_COMMENT)
         );
 
@@ -87,5 +88,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<Comment> getComments(Long postId) {
         return commentRepository.findAllById(Collections.singleton(postId));
+    }
+
+    public Comment getComment(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(
+                () -> new PostException(PostExceptionType.NOT_FOUND_COMMENT)
+        );
     }
 }

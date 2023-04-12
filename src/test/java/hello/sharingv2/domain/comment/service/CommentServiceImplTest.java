@@ -2,11 +2,14 @@ package hello.sharingv2.domain.comment.service;
 
 import hello.sharingv2.domain.comment.Comment;
 import hello.sharingv2.domain.comment.dto.CommentDto;
+import hello.sharingv2.domain.comment.repository.CommentRepository;
 import hello.sharingv2.domain.member.Member;
 import hello.sharingv2.domain.member.dto.MemberSignUpDto;
 import hello.sharingv2.domain.member.service.MemberService;
 import hello.sharingv2.domain.post.Post;
 import hello.sharingv2.domain.post.dto.PostDto;
+import hello.sharingv2.domain.post.exception.PostException;
+import hello.sharingv2.domain.post.exception.PostExceptionType;
 import hello.sharingv2.domain.post.repository.PostRepository;
 import hello.sharingv2.domain.post.service.PostService;
 import org.junit.jupiter.api.Assertions;
@@ -38,6 +41,7 @@ class CommentServiceImplTest {
     @Autowired CommentService commentService;
     @Autowired PostService postService;
     @Autowired MemberService memberService;
+    @Autowired CommentRepository commentRepository;
 
     MemberSignUpDto signUpDto = new MemberSignUpDto("ww@mail", "1234", "seed", "Kim");
     PostDto postDto = new PostDto("hello", "spring", "kakao");
@@ -79,42 +83,71 @@ class CommentServiceImplTest {
         commentService.saveRe(reply2, member.getId(), post.getId(), parentId);
 
         //then
-        List<Comment> comments = commentService.getComments(post.getId());
-        Comment comment = comments.get(0);
+        Comment comment = commentRepository.findById(parentId).orElseThrow(
+                () -> new PostException(PostExceptionType.NOT_FOUND_COMMENT)
+        );
 
         assertEquals(reply.getContent(), comment.getReplies().get(0).getContent());
         assertEquals(2, comment.getReplies().size());
     }
 
+    /**
+     * 대댓글 있는 댓글 삭제 시 (알 수 없음) 변경 후 디비 삭제 x
+     */
     @Test
     void 대댓글있는_댓글_삭제() throws Exception {
         Member member = memberService.getMember("ww@mail");
         Post post = postService.getPost(member.getPosts().get(0).getId());
         CommentDto commentDto = new CommentDto("hi"); // 댓글
-        CommentDto commentDto2 = new CommentDto("spring"); // 댓글
-        CommentDto commentDto3 = new CommentDto("starbucks"); // 댓글
+        CommentDto reComment = new CommentDto("hi2");
+        CommentDto reComment2 = new CommentDto("hi3");
 
+        Long originId = commentService.save(commentDto, member.getId(), post.getId());
+        commentService.saveRe(reComment2, member.getId(), post.getId(), originId);
+        commentService.saveRe(reComment, member.getId(), post.getId(), originId);
 
+        commentService.delete(originId);
+        Comment comment = commentRepository.findById(originId).orElseThrow(
+                () -> new PostException(PostExceptionType.NOT_FOUND_COMMENT)
+        );
+
+        assertEquals("삭제된 댓글입니다", comment.getContent());
+        assertEquals(2, comment.getReplies().size());
     }
 
+    /*
+        대댓글 없는 댓글 삭제 시 : 바로 삭제 (디비 삭제)
+     */
     @Test
-    void 대댓글_삭제() throws Exception {
+    void 대댓글_없는_댓글_삭제() throws Exception {
         Member member = memberService.getMember("ww@mail");
         Post post = postService.getPost(member.getPosts().get(0).getId());
         CommentDto commentDto = new CommentDto("hi"); // 댓글
-        CommentDto commentDto2 = new CommentDto("spring"); // 댓글
-        CommentDto commentDto3 = new CommentDto("starbucks"); // 댓글
 
-        commentService.save(commentDto, member.getId(), post.getId());
-        commentService.save(commentDto2, member.getId(), post.getId());
-        commentService.save(commentDto3, member.getId(), post.getId());
+        Long originId = commentService.save(commentDto, member.getId(), post.getId());
 
-        List<Comment> comments = commentService.getComments(post.getId());
-        commentService.delete(comments.get(0).getId());
+        commentService.delete(originId);
+
+        assertThrows(PostException.class, () -> commentService.getComment(originId));
     }
 
     @Test
-    void update() {
-    }
+    void update_success() throws Exception {
+        //given
+        Member member = memberService.getMember("ww@mail");
+        Post post = postService.getPost(member.getPosts().get(0).getId());
+        CommentDto commentDto = new CommentDto("hi"); // 댓글
+        CommentDto updateDto = new CommentDto("revised content");
 
+        Long originId = commentService.save(commentDto, member.getId(), post.getId());
+        //when
+        Comment comment = commentRepository.findById(originId).orElseThrow(
+                () -> new PostException(PostExceptionType.NOT_FOUND_COMMENT)
+        );
+
+        commentService.update(comment.getId(), updateDto);
+
+        //then
+        assertEquals(updateDto.getContent(), comment.getContent());
+    }
 }

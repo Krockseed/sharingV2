@@ -30,4 +30,6 @@ public interface CommentService {
     void update(Long id, CommentDto commentDto) throws Exception;
 
     List<Comment> getComments(Long postId);
+
+    Comment getComment(Long commentId);
 }
