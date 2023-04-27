@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 public enum PostExceptionType implements BaseExceptionType {
 
     NOT_FOUND_POST(600, HttpStatus.OK, "글을 찾을 수 없습니다."),
-    NOT_FOUND_COMMENT(610, HttpStatus.OK, "댓글을 찾을 수 없습니다");
+    NOT_FOUND_COMMENT(610, HttpStatus.OK, "댓글을 찾을 수 없습니다"),
+    NOT_FOUND_TAG(620, HttpStatus.OK, "태그를 찾을 수 없습니다.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;

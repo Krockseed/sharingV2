@@ -63,11 +63,17 @@ public class PostServiceImpl implements PostService {
         post.setLastModifiedAt(LocalDateTime.now());
     }
 
+    public int updateHits(Long postId) {
+        return postRepository.updateHits(postId);
+    }
+
     @Override
+    @Transactional(readOnly = true)
     public Post getPost(Long id) {
         return postRepository.findById(id).get();
     }
 
+    @Transactional(readOnly = true)
     public List<Post> getAllPosts() {
         return new ArrayList<>(postRepository.getAllBy());
     }

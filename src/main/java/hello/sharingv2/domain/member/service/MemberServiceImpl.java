@@ -52,6 +52,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Member getMember(String email) {
         return memberRepository.findByUsername(email).orElseThrow(
                 () -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER)

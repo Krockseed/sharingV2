@@ -29,6 +29,12 @@ public class Post extends BaseTimeEntity {
 
     private String createdBy;
 
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int hits;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Tag> tags = new ArrayList<>();
+
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
