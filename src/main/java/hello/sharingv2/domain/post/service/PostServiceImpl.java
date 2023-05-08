@@ -6,6 +6,8 @@ import hello.sharingv2.domain.member.exception.MemberExceptionType;
 import hello.sharingv2.domain.member.repository.MemberRepository;
 import hello.sharingv2.domain.post.Post;
 import hello.sharingv2.domain.post.dto.PostDto;
+import hello.sharingv2.domain.post.exception.PostException;
+import hello.sharingv2.domain.post.exception.PostExceptionType;
 import hello.sharingv2.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +67,20 @@ public class PostServiceImpl implements PostService {
 
     public int updateHits(Long postId) {
         return postRepository.updateHits(postId);
+    }
+
+    public int increaseLikes(Long postId) {
+        return postRepository.like(postId);
+    }
+
+    public int decreaseLikes(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new PostException(PostExceptionType.NOT_FOUND_POST)
+        );
+
+        if (post.getLikes() > 0) {
+            return postRepository.unlike(postId);
+        } else throw new PostException(PostExceptionType.CANNOT_DECEASE_LIKES);
     }
 
     @Override

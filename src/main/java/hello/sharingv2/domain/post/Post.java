@@ -32,6 +32,9 @@ public class Post extends BaseTimeEntity {
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int hits;
 
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int likes;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Tag> tags = new ArrayList<>();
 

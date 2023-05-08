@@ -14,4 +14,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Modifying
     @Query("update Post p set p.hits = p.hits + 1 where p.id = :postId")
     int updateHits(Long postId);
+
+    @Modifying
+    @Query("update Post p set p.likes = p.likes + 1 where p.id = :postId")
+    int like(Long postId);
+
+    @Modifying
+    @Query("update Post p set p.likes = p.likes - 1 where  p.id = :postId")
+    int unlike(Long postId);
 }
