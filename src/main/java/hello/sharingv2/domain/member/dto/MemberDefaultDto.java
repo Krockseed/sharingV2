@@ -7,4 +7,8 @@ public record MemberDefaultDto(String username, String password, String cPasswor
     public Member toEntity() {
         return Member.builder().username(username).password(password).nickname(nickname).build();
     }
+
+    public boolean invalidPassword() {
+        return !password.equals(cPassword);
+    }
 }

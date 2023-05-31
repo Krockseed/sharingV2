@@ -10,5 +10,7 @@ public interface MemberService {
 
     void signOut(MemberDefaultDto defaultDto);
 
+    void update(MemberDefaultDto defaultDto);
+
     Member getMember(String email);
 }

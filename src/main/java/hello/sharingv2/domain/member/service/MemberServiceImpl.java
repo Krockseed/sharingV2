@@ -8,13 +8,17 @@ import hello.sharingv2.domain.member.exception.MemberExceptionType;
 import hello.sharingv2.domain.member.repository.MemberRepository;
 import hello.sharingv2.domain.post.Post;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
@@ -27,6 +31,9 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Member member = signUpDto.toEntity();
+        log.info("memberSignUpDto = {}", signUpDto);
+        log.info("member password = {}", member.getPassword());
+
         member.encodePassword(passwordEncoder);
 
         memberRepository.save(member);
@@ -49,6 +56,18 @@ public class MemberServiceImpl implements MemberService {
         }
 
         memberRepository.delete(member);
+    }
+
+    @Override
+    public void update(MemberDefaultDto defaultDto) {
+        if (defaultDto.invalidPassword()) return;
+
+        Member member = memberRepository.findByUsername(defaultDto.username()).orElseThrow(
+                () -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER)
+        );
+
+        member.updateNickname(defaultDto.nickname());
+        member.setLastModifiedAt(LocalDateTime.now());
     }
 
     @Override
