@@ -29,10 +29,11 @@ public class MemberServiceImpl implements MemberService {
         if (memberRepository.existsByUsername(signUpDto.username())) {
             throw new MemberException(MemberExceptionType.ALREADY_EXIST_USERNAME);
         }
+        if (memberRepository.existsByNickname(signUpDto.nickname())) {
+            throw new MemberException(MemberExceptionType.ALREADY_EXIST_NICKNAME);
+        }
 
         Member member = signUpDto.toEntity();
-        log.info("memberSignUpDto = {}", signUpDto);
-        log.info("member password = {}", member.getPassword());
 
         member.encodePassword(passwordEncoder);
 

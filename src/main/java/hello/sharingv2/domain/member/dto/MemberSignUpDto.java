@@ -2,10 +2,18 @@ package hello.sharingv2.domain.member.dto;
 
 import hello.sharingv2.domain.member.Member;
 import hello.sharingv2.domain.member.Role;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 
-public record MemberSignUpDto(String username, String password, String nickname, String name) {
+public record MemberSignUpDto(
+        @Email String username,
+        // Validation 관련, String -> @Size, Integer -> @Min, @Max
+        @NotBlank @Size(min = 4, max = 15) String password,
+        @NotBlank @Size(min = 4, max = 15) String nickname,
+        @NotBlank @Size(min = 3, max = 15) String name) {
 
     /**
      * 새로운 기능 추가될 때마다 new ArrayList<>() 를 통해 빈 객체를 생성해줘야 한다

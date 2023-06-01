@@ -3,6 +3,7 @@ package hello.sharingv2.domain.member;
 import hello.sharingv2.domain.member.dto.MemberDefaultDto;
 import hello.sharingv2.domain.member.dto.MemberSignUpDto;
 import hello.sharingv2.domain.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("test/v1/signup")
-    public ResponseEntity signUp(@RequestBody MemberSignUpDto signUpDto) {
+    public ResponseEntity signUp(@RequestBody @Valid MemberSignUpDto signUpDto) {
         memberService.signUp(signUpDto);
 
         log.info("member signUp Success");
@@ -25,7 +26,7 @@ public class MemberController {
     }
 
     @PostMapping("/test/v1/{email}")
-    public ResponseEntity getMemberInfo(@PathVariable String email) {
+    public ResponseEntity getMemberInfo(@PathVariable @Valid String email) {
         Member member = memberService.getMember(email);
         log.info("this");
 
